@@ -1,0 +1,79 @@
+// Crear Usuarios
+CREATE (alice:Usuario {nombre: 'Alice', edad: 25})
+CREATE (bob:Usuario {nombre: 'Bob', edad: 30})
+CREATE (carol:Usuario {nombre: 'Carol', edad: 22})
+CREATE (dave:Usuario {nombre: 'Dave', edad: 28})
+CREATE (emma:Usuario {nombre: 'Emma', edad: 34})
+CREATE (frank:Usuario {nombre: 'Frank', edad: 45})
+
+// Crear Artistas
+CREATE (daftPunk:Artista {nombre: 'Daft Punk'})
+CREATE (taylorSwift:Artista {nombre: 'Taylor Swift'})
+CREATE (billieEilish:Artista {nombre: 'Billie Eilish'})
+
+// Crear Canciones
+CREATE (song1:Cancion {titulo: 'Get Lucky', año: 2013})
+CREATE (song2:Cancion {titulo: 'Shake It Off', año: 2014})
+CREATE (song3:Cancion {titulo: 'Bad Guy', año: 2019})
+
+// Crear Eventos
+CREATE (event1:Evento {nombre: 'Concierto de Verano', fecha: '2021-07-15'})
+CREATE (event2:Evento {nombre: 'Festival de Música', fecha: '2021-08-21'})
+
+// Crear relaciones SIGUE entre Usuarios y Artistas
+MATCH (u:Usuario), (a:Artista)
+WHERE u.nombre = 'Alice' AND a.nombre = 'Daft Punk'
+CREATE (u)-[:SIGUE]->(a);
+
+MATCH (a:Artista), (u:Usuario)
+WHERE a.nombre = 'Taylor Swift' AND u.nombre IN ['Dave', 'Frank']
+CREATE (u)-[:SIGUE]->(a);
+
+MATCH (a:Artista), (u:Usuario)
+WHERE a.nombre = 'Daft Punk' AND u.nombre IN ['Dave', 'Emma']
+CREATE (u)-[:SIGUE]->(a);
+
+MATCH (a:Artista), (u:Usuario)
+WHERE a.nombre = 'Billie Eilish' AND u.nombre IN ['Emma', 'Frank']
+CREATE (u)-[:SIGUE]->(a);
+
+MATCH (u:Usuario), (a:Artista)
+WHERE u.nombre = 'Bob' AND a.nombre = 'Taylor Swift'
+CREATE (u)-[:SIGUE]->(a);
+
+// Crear relaciones ASISTE entre Usuarios y Eventos
+MATCH (u:Usuario), (e:Evento)
+WHERE u.nombre = 'Carol' AND e.nombre = 'Concierto de Verano'
+CREATE (u)-[:ASISTE]->(e);
+
+MATCH (u:Usuario), (e:Evento)
+WHERE u.nombre = 'Alice' AND e.nombre = 'Festival de Música'
+CREATE (u)-[:ASISTE]->(e);
+
+// Crear relaciones INTERPRETA entre Artistas y Canciones
+MATCH (a:Artista), (s:Cancion)
+WHERE a.nombre = 'Daft Punk' AND s.titulo = 'Get Lucky'
+CREATE (a)-[:INTERPRETA]->(s);
+
+MATCH (a:Artista), (s:Cancion)
+WHERE a.nombre = 'Taylor Swift' AND s.titulo = 'Shake It Off'
+CREATE (a)-[:INTERPRETA]->(s);
+
+// Crear relaciones RECOMIENDA entre Usuarios sobre Canciones
+MATCH (u1:Usuario {nombre: 'Alice'}), (u2:Usuario {nombre: 'Bob'}), (s:Cancion {titulo: 'Bad Guy'})
+CREATE (u1)-[:RECOMIENDA {fecha: '2021-09-01'}]->(u2);
+CREATE (u2)-[:RECOMIENDA]->(s);
+
+
+// Crear relaciones FEATURED
+// Conectar "Get Lucky" de Daft Punk con el "Festival de Música"
+MATCH (s:Cancion {titulo: 'Get Lucky'}), (e:Evento {nombre: 'Festival de Música'})
+CREATE (s)-[:FEATURED]->(e);
+
+// Conectar "Shake It Off" de Taylor Swift con el "Concierto de Verano"
+MATCH (s:Cancion {titulo: 'Shake It Off'}), (e:Evento {nombre: 'Concierto de Verano'})
+CREATE (s)-[:FEATURED]->(e);
+
+// Si "Bad Guy" de Billie Eilish también debe estar en algún evento, puedes añadirlo
+MATCH (s:Cancion {titulo: 'Bad Guy'}), (e:Evento {nombre: 'Festival de Música'})  // o cualquier otro evento
+CREATE (s)-[:FEATURED]->(e);
